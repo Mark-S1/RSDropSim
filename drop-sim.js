@@ -41,7 +41,9 @@ function loadWikiDropData(pageName) {
 					dropTables[tableIndex][tableName] = [];
 				}
 				
-				dropTables[tableIndex][tableName].push(lines[i]);
+				let parsedData = parseDropData(lines[i]);
+				//dropTables[tableIndex][tableName].push(lines[i]);
+				dropTables[tableIndex][tableName].push(parsedData);
 			}
 		}
 		
@@ -65,26 +67,28 @@ function loadWikiDropData(pageName) {
 }
 
 function parseDropData(line) {
-	let splitData = line.split("|");
-	
+	let splitData = line.replaceAll("{{","").replaceAll("}}","").split("|");
 	let itemData = {};
+	console.log(splitData);
 	
 	for(let i = 0; i < splitData.length; i++) {
 		if(splitData[i].indexOf("name=") == 0) {
+			if(itemData.name) continue;	//prevent override from nested template such as NamedRef
 			itemData.name = splitData[i].split("=")[1];
 		}
 		
+		//reference: https://oldschool.runescape.wiki/w/Template:DropsLine
 		if(splitData[i].indexOf("rarity=") == 0) {
 			let rarity = splitData[i].split("=")[1];
 			
 			if(rarity.indexOf("/") >= 0) {
 				let nums = rarity.split("/");
-				let numerator = Number(nums[0]);
-				let denominator = Number(nums[1]);
-				itemData.rarity = numerator/denominator;
+				itemData.numerator = Number(nums[0]);
+				itemData.denominator = Number(nums[1]);
+				itemData.rarity = itemData.numerator/itemData.denominator;
 				
 			} else if(rarity == "Always") {
-				itemData.rarity = "1";
+				itemData.rarity = 1;
 				
 			} else {
 				itemData.rarity = rarity;
