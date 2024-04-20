@@ -1,5 +1,9 @@
 let currentDropTables = [];
 
+document.getElementById("submit-monster").onclick = () => {
+	console.log("E");
+};
+
 function loadWikiDropData(pageName) {
 	let url = `https://oldschool.runescape.wiki/api.php?action=query&prop=revisions&titles=${pageName}&format=json&rvprop=content&rvslots=*&formatversion=2`
 	
