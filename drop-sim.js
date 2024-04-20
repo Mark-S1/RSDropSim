@@ -43,6 +43,9 @@ function populateTable() {
 		for(let j = 0; j < dataKeys.length; j++) {
 			let td = document.createElement("td");
 			td.innerText = currentDropTables[0].drops[i][dataKeys[j]];
+			
+			if(j > 0) td.classList.add("number-cell");
+			
 			tr.appendChild(td);
 		}
 		

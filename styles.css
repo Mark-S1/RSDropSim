@@ -1,0 +1,12 @@
+.number-cell {
+	text-align: center;
+}
+
+table {
+	width: 800px;
+	border-collapse: collapse;
+}
+
+th, td {
+	border: 1px solid black;
+}
