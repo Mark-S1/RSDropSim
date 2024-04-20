@@ -72,6 +72,11 @@ function parseDropData(line) {
 	console.log(splitData);
 	
 	for(let i = 0; i < splitData.length; i++) {
+		if(splitData[0] == "DropsLineClue" && splitData[i].indexOf("type=") == 0) {
+			let type = splitData[i].split("=")[1];
+			itemData.name = `Clue scroll (${type})`;
+		}
+		
 		if(splitData[i].indexOf("name=") == 0) {
 			if(itemData.name) continue;	//prevent override from nested template such as NamedRef
 			itemData.name = splitData[i].split("=")[1];
