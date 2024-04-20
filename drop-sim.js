@@ -1,5 +1,6 @@
-function loadWikiDropData() {
-	let pageName = "Evil Chicken";
+let currentDropTables = [];
+
+function loadWikiDropData(pageName) {
 	pageName.replaceAll(" ", "_");
 	
 	let url = `https://oldschool.runescape.wiki/api.php?action=query&prop=revisions&titles=${pageName}&format=json&rvprop=content&rvslots=*&formatversion=2`
@@ -17,6 +18,13 @@ function loadWikiDropData() {
 		let dropTables = [];
 		let tableIndex = 0;
 		let tableName = "drops";
+		
+		if(lines[0].startsWith("#REDIRECT")) {
+			let redirectName = lines[0].substring(lines[0].indexOf("[[")+2, lines[0].indexOf("]]"));
+			console.log(`Redirecting from "${pageName}" to "${redirectName}"`);
+			loadWikiDropData(redirectName);
+			return;
+		}
 		
 		for(let i = 0; i < lines.length; i++) {
 			if(!dropTables[tableIndex]) dropTables[tableIndex] = {};
@@ -46,6 +54,7 @@ function loadWikiDropData() {
 		}
 		
 		console.log(dropTables);
+		currentDropTables = dropTables;
 	};
 	
 	xhr.onerror = () => {
