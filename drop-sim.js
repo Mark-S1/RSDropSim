@@ -1,15 +1,21 @@
 let currentDropTables = [];
 const dataTable = document.getElementById("data-table");
+const errorMessageField = document.getElementById("error-message");
 
 document.getElementById("submit-monster").onclick = () => {
 	let pageName = document.getElementById("page-name").value;
+	
+	errorMessageField.innerText = "";
 	
 	loadWikiDropData(pageName, populateTable);
 };
 
 function populateTable() {
 	console.log(currentDropTables);
-	if(currentDropTables.length == 0) return;
+	if(currentDropTables.length == 0) {
+		errorMessageField.innerText = "No loot data available"
+		return;
+	}
 	
 	dataTable.innerHTML = "";	//clear the table
 	
@@ -32,7 +38,7 @@ function populateTable() {
 		
 		let dataKeys = ["name", "minQuantity", "maxQuantity", "numerator", "denominator", "rarity"];
 		
-		console.log(currentDropTables[i]);
+		console.log(dropTable[i]);
 		
 		for(let j = 0; j < dataKeys.length; j++) {
 			let td = document.createElement("td");
@@ -76,7 +82,7 @@ function loadWikiDropData(pageName, callback) {
 				tableName = "drops";
 			}
 			
-			if(lines[i].toLowerCase().includes("tertiary")) {
+			if(lines[i].toLowerCase().includes("tertiary") && dropTables[tableIndex].drops) {
 				tableName = lines[i].replaceAll("=", "");
 			}
 			
