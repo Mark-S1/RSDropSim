@@ -1,8 +1,6 @@
 let currentDropTables = [];
 
 function loadWikiDropData(pageName) {
-	pageName.replaceAll(" ", "_");
-	
 	let url = `https://oldschool.runescape.wiki/api.php?action=query&prop=revisions&titles=${pageName}&format=json&rvprop=content&rvslots=*&formatversion=2`
 	
 	let xhr = new XMLHttpRequest();
@@ -64,4 +62,54 @@ function loadWikiDropData(pageName) {
 	
 	xhr.open("GET", url);
 	xhr.send();
+}
+
+function parseDropData(line) {
+	let splitData = line.split("|");
+	
+	let itemData = {};
+	
+	for(let i = 0; i < splitData.length; i++) {
+		if(splitData[i].indexOf("name=") == 0) {
+			itemData.name = splitData[i].split("=")[1];
+		}
+		
+		if(splitData[i].indexOf("rarity=") == 0) {
+			let rarity = splitData[i].split("=")[1];
+			
+			if(rarity.indexOf("/") >= 0) {
+				let nums = rarity.split("/");
+				let numerator = Number(nums[0]);
+				let denominator = Number(nums[1]);
+				itemData.rarity = numerator/denominator;
+				
+			} else if(rarity == "Always") {
+				itemData.rarity = "1";
+				
+			} else {
+				itemData.rarity = rarity;
+			}
+		}
+		
+		if(splitData[i].indexOf("quantity=") == 0) {
+			let quantity = splitData[i].split("=")[1];
+			
+			if(quantity.indexOf("(noted)") >= 0) {
+				quantity = quantity.substring(0, quantity.indexOf("(noted)")).trim();
+				itemData.isNoted = true;
+			}
+			
+			if(isNaN(Number(quantity))) {
+				let nums = quantity.split("-");
+				itemData.minQuantity = Number(nums[0]);
+				itemData.maxQuantity = Number(nums[1]);
+				
+			} else {
+				itemData.minQuantity = Number(quantity);
+				itemData.maxQuantity = Number(quantity);
+			}
+		}
+	}
+	
+	return itemData;
 }
