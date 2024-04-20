@@ -1,20 +1,60 @@
 let currentDropTables = [];
+const dataTable = document.getElementById("data-table");
 
 document.getElementById("submit-monster").onclick = () => {
-	console.log("E");
+	let pageName = document.getElementById("page-name").value;
+	
+	loadWikiDropData(pageName, populateTable);
 };
 
-function loadWikiDropData(pageName) {
+function populateTable() {
+	console.log(currentDropTables);
+	if(currentDropTables.length == 0) return;
+	
+	dataTable.innerHTML = "";	//clear the table
+	
+	let thead = document.createElement("thead");
+	
+	const tableHeaderValues = ["Name", "Min", "Max", "Numerator", "Denominator", "Rarity"];
+	
+	for(let i = 0; i < tableHeaderValues.length; i++) {
+		let th = document.createElement("th");
+		th.innerText = tableHeaderValues[i];
+		thead.appendChild(th);
+	}
+	
+	dataTable.appendChild(thead);
+	
+	let dropTable = currentDropTables[0].drops;
+	
+	for(let i = 0; i < dropTable.length; i++) {
+		let tr = document.createElement("tr");
+		
+		let dataKeys = ["name", "minQuantity", "maxQuantity", "numerator", "denominator", "rarity"];
+		
+		console.log(currentDropTables[i]);
+		
+		for(let j = 0; j < dataKeys.length; j++) {
+			let td = document.createElement("td");
+			td.innerText = currentDropTables[0].drops[i][dataKeys[j]];
+			tr.appendChild(td);
+		}
+		
+		dataTable.appendChild(tr);
+	}
+	
+}
+
+function loadWikiDropData(pageName, callback) {
 	let url = `https://oldschool.runescape.wiki/api.php?action=query&prop=revisions&titles=${pageName}&format=json&rvprop=content&rvslots=*&formatversion=2`
 	
 	let xhr = new XMLHttpRequest();
 	
 	xhr.onload = () => {
-		console.log("onload");
 		let responseJson = JSON.parse(xhr.response);
 		//console.log(responseJson);
 		let pageContent = responseJson.query.pages[0].revisions[0].slots.main.content;
-		console.log(pageContent);
+		//console.log(pageContent);
 		
 		let lines = pageContent.split("\n");
 		let dropTables = [];
@@ -24,7 +64,7 @@ function loadWikiDropData(pageName) {
 		if(lines[0].startsWith("#REDIRECT")) {
 			let redirectName = lines[0].substring(lines[0].indexOf("[[")+2, lines[0].indexOf("]]"));
 			console.log(`Redirecting from "${pageName}" to "${redirectName}"`);
-			loadWikiDropData(redirectName);
+			loadWikiDropData(redirectName, callback);
 			return;
 		}
 		
@@ -57,8 +97,9 @@ function loadWikiDropData(pageName) {
 			}
 		}
 		
-		console.log(dropTables);
+		//console.log(dropTables);
 		currentDropTables = dropTables;
+		callback();
 	};
 	
 	xhr.onerror = () => {
@@ -66,7 +107,7 @@ function loadWikiDropData(pageName) {
 		console.log(xhr.response);
 	};
 	
-	xhr.open("GET", url);
+	xhr.open("GET", url, true);
 	xhr.send();
 }
 
@@ -97,6 +138,8 @@ function parseDropData(line) {
 				itemData.rarity = itemData.numerator/itemData.denominator;
 				
 			} else if(rarity == "Always") {
+				itemData.numerator = 1;
+				itemData.denominator = 1;
 				itemData.rarity = 1;
 				
 			} else {
