@@ -11,7 +11,9 @@ document.getElementById("submit-monster").onclick = () => {
 };
 
 function loadTables() {
+	const dropTableSelect = document.getElementById("drop-table-select");
 	dataTables.innerHTML = "";	//clear the table
+	dropTableSelect.innerHTML = "";
 	
 	if(currentDropTables.length == 0) {
 		errorMessageField.innerText = "No loot data available"
@@ -19,14 +21,34 @@ function loadTables() {
 	}
 	
 	for(let i = 0; i < currentDropTables.length; i++) {
-		populateTable(currentDropTables[i]);
+		populateTable(currentDropTables[i], i);
+	}
+	
+	if(currentDropTables.length > 1) {
+		dropTableSelect.style.display = "initial";
+		
+		for(let i = 0; i < currentDropTables.length; i++) {
+			const op = document.createElement("option");
+			op.value = i;
+			op.innerText = `Table ${i+1}`;
+			dropTableSelect.appendChild(op);
+		}
+	} else {
+		dropTableSelect.style.display = "";
 	}
 }
 
-function populateTable(dropTable) {
+function populateTable(dropTable, tableIndex) {
+	const dataTableContainer = document.createElement("div");
+	const dataTableLabel = document.createElement("h2");
 	const dataTable = document.createElement("table");
 	const thead = document.createElement("thead");
+	
 	const tableHeaderValues = ["Name", "Min", "Max", "Numerator", "Denominator", "Rarity"];
+	
+	dataTableLabel.innerText = `Table ${tableIndex+1}`;
+	
+	//Object.getOwnPropertyNames(dropTable).length > 1 indicates there must be tertiary drops
 	
 	for(let i = 0; i < tableHeaderValues.length; i++) {
 		let th = document.createElement("th");
@@ -43,7 +65,7 @@ function populateTable(dropTable) {
 		
 		let dataKeys = ["name", "minQuantity", "maxQuantity", "numerator", "denominator", "rarity"];
 		
-		console.log(dropTable[i]);
+		console.log(mainDropTable[i]);
 		
 		for(let j = 0; j < dataKeys.length; j++) {
 			let td = document.createElement("td");
@@ -57,7 +79,9 @@ function populateTable(dropTable) {
 		dataTable.appendChild(tr);
 	}
 	
-	dataTables.appendChild(dataTable);
+	dataTables.appendChild(dataTableContainer);
+	dataTableContainer.appendChild(dataTableLabel);
+	dataTableContainer.appendChild(dataTable);
 }
 
 function loadWikiDropData(pageName, callback) {

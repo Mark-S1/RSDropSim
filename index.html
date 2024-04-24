@@ -12,10 +12,15 @@
 	<h1>RS Drop Simulator</h1>
 	<p>Simulate loot from monsters in RuneScape</p>
 	<form role="search" onsubmit="return false">
-		<input id="page-name" type="text">
+		<input id="page-name" type="text" autocomplete="off">
 		<button id="submit-monster">Get Data</button>
 	</form>
 	<p id="error-message"></p>
 	<div id="data-tables"></div>
+	<div>
+		<h2>Simluator</h2>
+		<select id="drop-table-select" name="drop-table"></select>
+		<button id="run-sim">Run Simulation</button>
+	</div>
 </body>
 </html>
